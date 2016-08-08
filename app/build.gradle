@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "24.0.1"
+
+    defaultConfig {
+        applicationId "com.wyf.application"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors{
+        flavor2{
+            applicationId 'a.com.wyf.application'
+            versionCode 2
+            versionName '2.0'
+            manifestPlaceholders = [appname:"flavors2"]
+        }
+        flavor1{
+            applicationId 'b.com.wyf.application'
+            versionCode 1
+            versionName '1.0'
+            manifestPlaceholders = [appname:"@string/app_name"]
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile files('libs/org.apache.http.legacy.jar')
+}
