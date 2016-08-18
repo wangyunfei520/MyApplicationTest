@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
@@ -21,17 +22,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
+
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 /**
  * 测试
  */
 public class MainActivity extends AppCompatActivity {
-
+    private static final String TAG = MainActivity.class.getSimpleName();
     private TextView textView;
+    private EditText input;
     private Handler handler = new Handler();
     private ProgressDialog m_progressDlg;
 
-    private static String path = Environment.getExternalStorageDirectory() + File.separator + "flavors2.apk";
+    private static String path = Environment.getRootDirectory() + File.separator + "app";
 
     private static String url = "";
     File file = null;
@@ -41,14 +47,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.show);
+        input = (EditText) findViewById(R.id.input);
         m_progressDlg = new ProgressDialog(this);
         textView.setText(Contant.BASE_URL);
+        file = new File(path);
+        String[] list = file.list();
+        for (int i = 0; i < list.length; i++) {
+            Log.d("@@@@@@@@@@@@@@@", "onCreate: " + i + list[i]);
+        }
+        textView.append("\n" + list.length);
+        path = path + File.separator +"flavors2.apk";
         file = new File(path);
         Log.d("MainActivity", "path: " + path);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downFile(url);
+                String s = input.getText().toString();
+                Log.d(TAG, "设置的s："+s);
+                if (TextUtils.isEmpty(s)){
+                    return;
+                }
+                JPushInterface.setAlias(MainActivity.this, s, new TagAliasCallback() {
+                    @Override
+                    public void gotResult(int code, String s, Set<String> set) {
+                        String logs;
+                        switch (code) {
+                            case 0:
+                                logs = "Set tag and alias success";
+                                Log.i(TAG, logs);
+                                break;
+
+                            case 6002:
+                                logs = "Failed to set alias and tags due to timeout. Try again after 60s.";
+                                Log.i(TAG, logs);
+                                break;
+
+                            default:
+                                logs = "Failed with errorCode = " + code;
+                                Log.e(TAG, logs);
+                        }
+
+                    }
+                });
+//                down();
+//                downFile(url);
             }
         });
     }
@@ -118,13 +160,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void down() {
-        Log.d("MainActivity", "下载完成");
+//        Log.d("MainActivity", "下载完成");
         handler.post(new Runnable() {
             public void run() {
-                m_progressDlg.cancel();
-                Log.d("MainActivity", "onCreate: "+file.exists());
-                String updata = Utils.updata(path);
-                Log.d("MainActivity", "onCreate: " + updata);
+//                m_progressDlg.cancel();
+                Log.d("MainActivity", "onCreate: " + file.exists());
+                if (file.exists()) {
+                    Log.d("start", "run: ");
+                    String updata = Utils.updata(path);
+                    Log.d("MainActivity", "onCreate: " + updata);
+                }
             }
         });
     }

@@ -1,5 +1,7 @@
 package com.wyf.application;
 
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +12,7 @@ import java.io.InputStream;
 public class Utils {
 
     public static String updata(String apkAbsolutePath){
+        Log.d("123456", "updata: "+ apkAbsolutePath);
         String[] args = { "pm", "install", "-r", apkAbsolutePath };
         String result = "";
         ProcessBuilder processBuilder = new ProcessBuilder(args);
